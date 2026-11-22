@@ -1,0 +1,325 @@
+{% extends "base_app.html" %}
+{% block title %}KYC ভেরিফিকেশন - InfinityWork{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-5 pb-8">
+  <!-- 1. EMOTIONAL & TRUSTED HERO SECTION -->
+  <section class="rounded-[2.2rem] bg-gradient-to-br from-emerald-800 via-emerald-900 to-emerald-950 text-white p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+    <div class="w-60 h-60 rounded-full bg-emerald-400/15 blur-3xl -top-20 -right-14 absolute pointer-events-none"></div>
+    <div class="w-40 h-40 rounded-full bg-yellow-300/10 blur-2xl -bottom-12 -left-10 absolute pointer-events-none"></div>
+
+    <div class="relative z-10 space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <span class="inline-flex items-center gap-1.5 bg-yellow-300 text-emerald-950 px-3.5 py-1 rounded-full text-[11px] font-extrabold">
+          <i class="fa-solid fa-shield-halved"></i> অ্যাকাউন্ট নিরাপত্তা ও দ্রুত পেমেন্ট
+        </span>
+        {% if user.kyc_verified %}
+        <span class="bg-emerald-500/25 border border-emerald-400 text-emerald-200 px-3 py-1 rounded-full text-xs font-extrabold">
+          <i class="fa-solid fa-circle-check mr-1 text-yellow-300"></i> KYC Verified ✓
+        </span>
+        {% endif %}
+      </div>
+
+      <h1 class="text-2xl sm:text-3xl font-extrabold leading-snug">
+        রিয়েল মেম্বারদের সুরক্ষায় <span class="text-yellow-300">KYC ভেরিফিকেশন</span>
+      </h1>
+
+      <p class="text-xs sm:text-sm text-emerald-100/90 leading-relaxed">
+        ৩০–৪০ হাজার ভুয়া বট ও ডুপ্লিকেট অ্যাকাউন্টের ভিড়ে প্রকৃত পরিশ্রমী মেম্বারদের দ্রুত টাস্ক অ্যাপ্রুভাল এবং মাত্র <b>৫–১০ মিনিটে</b> উইথড্র নিশ্চিত করতেই এই বিশেষ উদ্যোগ। যে <b>৫০৳</b> দিয়ে আপনি KYC করবেন, সেটিও আপনার অ্যাকাউন্ট ব্যালেন্সেই যোগ হয়ে যাবে!
+      </p>
+
+      <!-- "বিস্তারিত জানুন" Popup Button -->
+      <div class="pt-1 flex flex-wrap items-center gap-3">
+        <button type="button" onclick="toggleKycNoticeModal(true)"
+                class="bg-white hover:bg-emerald-50 text-emerald-950 px-6 py-3 rounded-full text-xs sm:text-sm font-extrabold shadow-lg inline-flex items-center gap-2 transition active:scale-95">
+          <i class="fa-solid fa-book-open text-emerald-700"></i>
+          <span>বিস্তারিত জানুন</span>
+          <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+        </button>
+
+        <span class="text-[11px] font-bold text-emerald-200">
+          <i class="fa-solid fa-heart text-rose-400 mr-1"></i> প্রতিষ্ঠাতার সরাসরি বার্তা পড়ুন
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. THREE TRUST SECTIONS: লাভ কী কী? • কাদের লাগবে না? • কেন করা? -->
+  <section class="grid md:grid-cols-2 gap-4">
+    <!-- Benefits: লাভ কী কী? -->
+    <div class="soft-card rounded-3xl p-5 sm:p-6 space-y-3 border-emerald-300 bg-gradient-to-b from-emerald-50/60 to-white md:col-span-2">
+      <h2 class="font-extrabold text-base text-emerald-950 flex items-center gap-2">
+        <span class="w-8 h-8 rounded-xl bg-emerald-900 text-yellow-300 flex items-center justify-center text-sm"><i class="fa-solid fa-gift"></i></span>
+        <span>KYC সম্পূর্ণ করলে কী কী সুবিধা পাবেন? (লাভ কী কী?)</span>
+      </h2>
+      <div class="grid sm:grid-cols-2 gap-2.5 text-xs font-semibold text-emerald-950">
+        <div class="bg-white border border-emerald-100 rounded-2xl p-3 flex items-center gap-2.5">
+          <i class="fa-solid fa-circle-check text-emerald-600 text-sm shrink-0"></i>
+          <span>টাকা তুলতে কোনো <b>রেফার করতে হবে না</b></span>
+        </div>
+        <div class="bg-white border border-emerald-100 rounded-2xl p-3 flex items-center gap-2.5">
+          <i class="fa-solid fa-circle-check text-emerald-600 text-sm shrink-0"></i>
+          <span>মাত্র <b>৫০ টাকা</b> হলেই উইথড্র তুলতে পারবেন</span>
+        </div>
+        <div class="bg-white border border-emerald-100 rounded-2xl p-3 flex items-center gap-2.5">
+          <i class="fa-solid fa-bolt text-amber-500 text-sm shrink-0"></i>
+          <span>অটো গেটওয়েতে <b>৫–১০ মিনিটের মধ্যে</b> Withdraw পাবেন</span>
+        </div>
+        <div class="bg-white border border-emerald-100 rounded-2xl p-3 flex items-center gap-2.5">
+          <i class="fa-solid fa-wallet text-emerald-600 text-sm shrink-0"></i>
+          <span>যে <b>৫০৳ ডিপোজিট</b> করবেন সেটি আপনার অ্যাকাউন্টেই এড হবে</span>
+        </div>
+        <div class="bg-white border border-emerald-100 rounded-2xl p-3 flex items-center gap-2.5">
+          <i class="fa-solid fa-shield-halved text-emerald-600 text-sm shrink-0"></i>
+          <span>অ্যাকাউন্ট কখনো <b>ব্যান হবে না</b> ও পূর্ণ সিকিউরিটি</span>
+        </div>
+        <div class="bg-white border border-emerald-100 rounded-2xl p-3 flex items-center gap-2.5">
+          <i class="fa-solid fa-crown text-amber-500 text-sm shrink-0"></i>
+          <span><b>Pro Membership Lv2</b> বোনাস ও লাইভ টেলিগ্রাম সাপোর্ট</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Who is Exempt: কাদের লাগবে না? -->
+    <div class="soft-card rounded-3xl p-5 space-y-2.5 bg-gradient-to-br from-sky-50/70 to-white border-sky-200">
+      <div class="flex items-center gap-2 font-extrabold text-sm text-emerald-950">
+        <span class="w-8 h-8 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center"><i class="fa-solid fa-user-check"></i></span>
+        <span>কাদের KYC লাগবে না?</span>
+      </div>
+      <ul class="space-y-2 text-xs text-emerald-900 font-medium leading-relaxed">
+        <li class="flex items-start gap-2">
+          <i class="fa-solid fa-check text-sky-600 mt-0.5"></i>
+          <span>যারা <b>২ মাসের বেশি সময়</b> ধরে আমাদের সাইটে অ্যাকাউন্ট করেছেন।</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <i class="fa-solid fa-check text-sky-600 mt-0.5"></i>
+          <span>এবং যারা ইতিমধ্যেই সফলভাবে <b>Withdrawal</b> নিয়েছেন — তাদের এটি নিতে হবে না।</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Why KYC: কেন করা হচ্ছে? -->
+    <div class="soft-card rounded-3xl p-5 space-y-2.5 bg-gradient-to-br from-amber-50/60 to-white border-amber-200">
+      <div class="flex items-center gap-2 font-extrabold text-sm text-emerald-950">
+        <span class="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center"><i class="fa-solid fa-scale-balanced"></i></span>
+        <span>কেন এই সিদ্ধান্ত নেওয়া হলো?</span>
+      </div>
+      <p class="text-xs text-emerald-900/90 leading-relaxed font-medium">
+        বট অ্যাকাউন্ট, ভুয়া রেফার, এক স্ক্রিনশট বারবার ব্যবহার ও বিদেশি ক্লায়েন্টদের কাজ নষ্ট হওয়া আটকাতেই এই ব্যবস্থা — যাতে <b>প্রকৃত সৎ মেম্বাররা</b> দ্রুত পেমেন্ট ও টাস্ক পান।
+      </p>
+    </div>
+  </section>
+
+  <!-- 3. KYC STATUS OR 2-STEP FORM -->
+  {% if user.kyc_verified %}
+  <section class="soft-card rounded-[2rem] p-7 text-center space-y-3 border-2 border-emerald-400 bg-emerald-50/70">
+    <div class="w-16 h-16 mx-auto rounded-full bg-emerald-700 text-white flex items-center justify-center text-3xl shadow">
+      <i class="fa-solid fa-circle-check"></i>
+    </div>
+    <h2 class="text-xl font-extrabold text-emerald-950">আপনার KYC ভেরিফিকেশন সম্পন্ন হয়েছে!</h2>
+    <p class="text-xs text-emerald-800">আপনার অ্যাকাউন্টে ৫০৳ ও Pro Lv2 বোনাস যুক্ত করা হয়েছে। এখন ৫০৳ হলেই রেফার ছাড়া উইথড্র নিন।</p>
+    <a href="/payout" class="inline-block bg-emerald-900 text-white px-6 py-3 rounded-full text-xs font-extrabold shadow">উইথড্র পেজে যান →</a>
+  </section>
+
+  {% elif latest_kyc and latest_kyc.status == 'pending' %}
+  <section class="soft-card rounded-[2rem] p-7 text-center space-y-3 border-2 border-amber-300 bg-amber-50/60">
+    <div class="w-16 h-16 mx-auto rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-3xl animate-pulse">
+      <i class="fa-solid fa-hourglass-half"></i>
+    </div>
+    <h2 class="text-xl font-extrabold text-emerald-950">আপনার KYC আবেদন যাচাই করা হচ্ছে</h2>
+    <p class="text-xs text-emerald-800">
+      মেথড: <b>{{ latest_kyc.method }}</b> • TrxID: <code class="font-mono font-bold">{{ latest_kyc.trx_id }}</code> • Sender: <b>{{ latest_kyc.sender_number }}</b>
+    </p>
+    <p class="text-[11px] text-amber-900 font-semibold">ভেরিফিকেশন সম্পন্ন হলেই আপনার অ্যাকাউন্টে ৫০৳ এবং Pro Lv2 যুক্ত হয়ে যাবে।</p>
+  </section>
+
+  {% else %}
+  {% if latest_kyc and latest_kyc.status == 'rejected' %}
+  <div class="rounded-2xl bg-red-50 border border-red-200 p-4 text-xs text-red-800 font-bold flex items-center gap-2.5">
+    <i class="fa-solid fa-triangle-exclamation text-red-600 text-base shrink-0"></i>
+    <span>আপনার পূর্বের KYC আবেদনটি (TrxID: {{ latest_kyc.trx_id }}) রিজেক্ট করা হয়েছিল। অনুগ্রহ করে সঠিক তথ্য ও নতুন TrxID দিয়ে আবার আবেদন করুন।</span>
+  </div>
+  {% endif %}
+
+  <!-- 2-STEP KYC SUBMISSION FORM -->
+  <form action="/kyc" method="POST" autocomplete="off" class="space-y-5">
+    <!-- STEP 1: PAYMENT (bKash, Nagad, Binance) -->
+    <section class="soft-card rounded-[2rem] p-5 sm:p-6 space-y-4">
+      <div class="flex items-center justify-between pb-2 border-b border-emerald-100">
+        <div class="flex items-center gap-2.5">
+          <span class="w-8 h-8 rounded-xl bg-emerald-900 text-yellow-300 font-extrabold flex items-center justify-center text-xs">০১</span>
+          <div>
+            <h2 class="font-extrabold text-sm text-emerald-950">Step 1: ৫০৳ পেমেন্ট সম্পন্ন করুন</h2>
+            <p class="text-[11px] text-emerald-700">এই ৫০৳ আপনার অ্যাকাউন্টেই যোগ হবে</p>
+          </div>
+        </div>
+        <span class="bg-emerald-100 text-emerald-900 px-3 py-1 rounded-full text-xs font-extrabold">৳50.00</span>
+      </div>
+
+      <!-- Method Selection -->
+      <div>
+        <label class="text-xs font-extrabold text-emerald-950 block mb-2">পেমেন্ট মেথড বেছে নিন</label>
+        <input type="hidden" name="method" id="kyc-method-input" value="bKash" />
+        <div class="grid grid-cols-3 gap-2.5">
+          <button type="button" onclick="selectKycMethod('bKash', '01618897806', 'Send Money (Personal)', this)"
+                  class="kyc-m-btn py-3 px-2 rounded-2xl border-2 border-emerald-700 bg-emerald-50 font-extrabold text-xs flex flex-col items-center gap-1 transition">
+            <svg viewBox="0 0 40 40" class="w-7 h-7"><path d="M8 10l12 6 10-8-4 14 6 6-14-2-8 6 2-12z" fill="#e2136e"/></svg>
+            <span>bKash</span>
+          </button>
+          <button type="button" onclick="selectKycMethod('Nagad', '01881138958', 'Send Money (Personal)', this)"
+                  class="kyc-m-btn py-3 px-2 rounded-2xl border border-emerald-200 bg-white font-extrabold text-xs flex flex-col items-center gap-1 transition">
+            <svg viewBox="0 0 40 40" class="w-7 h-7"><circle cx="20" cy="20" r="14" fill="#f26522"/><path d="M13 24c2-8 9-12 15-10-4 2-6 5-7 10z" fill="#fff"/></svg>
+            <span>Nagad</span>
+          </button>
+          <button type="button" onclick="selectKycMethod('Binance', '1024032723', 'Binance Pay ID (0.45 USDT)', this)"
+                  class="kyc-m-btn py-3 px-2 rounded-2xl border border-emerald-200 bg-white font-extrabold text-xs flex flex-col items-center gap-1 transition">
+            <svg viewBox="0 0 40 40" class="w-7 h-7"><path d="M20 8l5 5-5 5-5-5zm-8 8l4 4-4 4-4-4zm16 0l4 4-4 4-4-4zm-8 6l5 5-5 5-5-5z" fill="#f3ba2f"/></svg>
+            <span>Binance</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Dynamic Payment Number Box -->
+      <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 space-y-2">
+        <div class="flex items-center justify-between text-xs font-extrabold text-emerald-900">
+          <span id="kyc-pay-title">bKash Send Money (Personal)</span>
+          <span class="text-emerald-700">পরিমাণ: ৳50</span>
+        </div>
+        <div class="flex items-center justify-between bg-white border border-emerald-200 rounded-xl px-3.5 py-2.5">
+          <span id="kyc-pay-number" class="font-mono text-base font-extrabold text-emerald-950">01618897806</span>
+          <button id="kyc-copy-btn" type="button" onclick="copyText(document.getElementById('kyc-pay-number').innerText, 'kyc-copy-btn')"
+                  class="bg-emerald-900 text-white px-3.5 py-1.5 rounded-xl text-xs font-extrabold">
+            নম্বর কপি
+          </button>
+        </div>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-3 text-sm">
+        <div>
+          <label class="text-xs font-extrabold text-emerald-950 block mb-1">আপনার Sender Number / Pay ID *</label>
+          <input type="text" name="sender_number" required autocomplete="off" placeholder="যে নম্বর থেকে টাকা পাঠিয়েছেন"
+                 class="w-full px-4 py-3 rounded-2xl border border-emerald-200 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+        </div>
+        <div>
+          <label class="text-xs font-extrabold text-emerald-950 block mb-1">Transaction ID (TrxID) *</label>
+          <input type="text" name="trx_id" required autocomplete="off" placeholder="যেমন: BKA8F3X92M"
+                 class="w-full px-4 py-3 rounded-2xl border border-emerald-200 bg-white font-mono font-bold uppercase focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+        </div>
+      </div>
+      <p class="text-[11px] text-rose-600 font-bold"><i class="fa-solid fa-circle-info mr-1"></i>সতর্কতা: একটি TrxID শুধুমাত্র একবারই জমা দেওয়া যাবে।</p>
+    </section>
+
+    <!-- STEP 2: IDENTITY (AUTOFILLED NAME & EMAIL) -->
+    <section class="soft-card rounded-[2rem] p-5 sm:p-6 space-y-4">
+      <div class="flex items-center gap-2.5 pb-2 border-b border-emerald-100">
+        <span class="w-8 h-8 rounded-xl bg-emerald-900 text-yellow-300 font-extrabold flex items-center justify-center text-xs">০২</span>
+        <div>
+          <h2 class="font-extrabold text-sm text-emerald-950">Step 2: অ্যাকাউন্ট তথ্য (Auto-Filled)</h2>
+          <p class="text-[11px] text-emerald-700">আপনার অ্যাকাউন্ট থেকে স্বয়ংক্রিয়ভাবে নেওয়া হয়েছে</p>
+        </div>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-3 text-sm">
+        <div>
+          <label class="text-xs font-bold text-emerald-900 block mb-1">আপনার নাম</label>
+          <input type="text" name="name" value="{{ user.name }}" readonly
+                 class="w-full px-4 py-3 rounded-2xl border border-emerald-200 bg-emerald-50/70 font-bold text-emerald-950" />
+        </div>
+        <div>
+          <label class="text-xs font-bold text-emerald-900 block mb-1">আপনার ইমেইল</label>
+          <input type="email" name="email" value="{{ user.email }}" readonly
+                 class="w-full px-4 py-3 rounded-2xl border border-emerald-200 bg-emerald-50/70 font-bold text-emerald-950" />
+        </div>
+      </div>
+
+      <button type="submit" class="w-full bg-gradient-to-r from-emerald-700 to-emerald-950 hover:opacity-95 text-white py-4 rounded-full font-extrabold text-sm shadow-xl flex items-center justify-center gap-2 transition">
+        <i class="fa-solid fa-shield-check"></i>
+        <span>KYC ভেরিফিকেশন সাবমিট করুন →</span>
+      </button>
+    </section>
+  </form>
+  {% endif %}
+</div>
+
+<!-- EXACT NOTICE MODAL ("বিস্তারিত জানুন" Popup - Unchanged Text) -->
+<div id="kyc-notice-modal" class="hidden fixed inset-0 z-[80] bg-emerald-950/65 backdrop-blur-sm flex items-center justify-center p-4">
+  <div class="bg-white rounded-[2rem] max-w-lg w-full max-h-[88vh] flex flex-col overflow-hidden shadow-2xl border border-emerald-200">
+    <!-- Modal Header -->
+    <div class="bg-gradient-to-r from-emerald-800 to-emerald-950 text-white px-6 py-4 flex items-center justify-between shrink-0">
+      <div class="flex items-center gap-2 font-extrabold text-sm">
+        <i class="fa-solid fa-bullhorn text-yellow-300"></i>
+        <span>প্রতিষ্ঠাতার জরুরি বার্তা</span>
+      </div>
+      <button type="button" onclick="toggleKycNoticeModal(false)" class="w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 text-white font-bold text-sm">✕</button>
+    </div>
+
+    <!-- Modal Body (EXACT USER NOTICE UNCHANGED) -->
+    <div class="p-6 overflow-y-auto text-xs sm:text-sm text-emerald-950 leading-relaxed space-y-3 font-medium">
+      <p class="font-extrabold">একটি খুশির খবর আর একটি দুঃখের খবর দেই।</p>
+
+      <p><b>খুশির খবর :</b> আমাদের ১ লক্ষ ৩৪ হাজার মেম্বার পূরণ হয়ে গিয়েছে। তারা প্রতিনিয়ত কাজ করছে, রেফার করছে, টাকা তুলছে।</p>
+
+      <p><b>দুঃখের খবর :</b> বেশির ভাগ মেম্বার ফেক, মানে বট একাউন্ট, রেফার ভুয়া, এক স্ক্রিনসট ৩/৪ টা আইডিতে ব্যবহার করে আপলোড দেয়। টাইপিং কাজ চ্যাটজিপি দিয়ে লিখিয়ে আপলোড দেয়। লাইক ফলোর কাজ লাইক ফলো দিয়ে স্ক্রিনশট নিয়ে আবার লাইক / ফলো তুলে নেয়।</p>
+
+      <p>এটা কিন্তু সবাই করে না! এটা করে প্রায় ৩০-৪০ হাজার মেম্বার। হয়তো যে এটা করে, সে এখন এই লেখা পড়ে মিটিমিটি হাসতেছে।</p>
+
+      <p><b>কিন্তু এর ফলে কী হচ্ছে জানেন?</b><br/>
+      যারা রিয়েল মেম্বার, যারা আসলেই ভালোভাবে কাজ করতে চায়, তারা একাউন্ট খুলতে পারছে না। যারা টাস্ক সাবমিট করে তাদের টাস্ক অনেক দেরিতে এপ্রুব হচ্ছে। যারা উইথড্র দিয়েছেন অনেক দেরিতে টাকা হাতে পাচ্ছেন। এছাড়া বাইরের দেশের যারা আমাদের কাজ দেয়, তাদের সামনে কী আমাদের মান সম্মান থাকছে? তাদের কাজগুলো কী আমরা প্রোপার ভাবে ডেলিভারি দিতে পারছি। তারা কী ভবিষ্যতে আমাদের আরও কাজ দিবে? তারা কাজ না দিলে আমরা টাস্ক দিবো কীভাবে আপনাদের?</p>
+
+      <p>ঠিক এই কারণেই কিন্তু, নতুন মেম্বার জয়েনিং আমরা অফ করেছি, রেফরও, কিন্তু কিচ্ছু সমাধান হচ্ছে না। এগুলো চলতেই আছে।</p>
+
+      <p>আসলে বাংলাদেশ বলুন আর ভারত অথবা পাকিস্তান বলুন, এই তিনটা দেশে কিন্তু রিয়েল, ডিপোজিট ছাড়া, ইনভেস্ট ছাড়া সাইট চালানো খুব মুশকিল। কত টাকার লস গুনতে হচ্ছে এটা আমরা জানি। আমাদের টিম অক্লান্ত পরিশ্রম করছে, আমার পরিচয় দিই, আমি ইনফিনিটির মালিক, জাহিদুর। আমার ইন্টার এর প্রি টেস্ট এক্সাম চলতেছে, শুধু পাস নাম্বারটা লিখে পরিক্ষার হল থেকে বের হয়েই সাইটের কাজে মনোযোগ দিচ্ছি। কিন্তু এগুলো দেখলে কী খুব ভালো লাগে?</p>
+
+      <p>এছাড়া সাইটের উপর থ্রেট, ভুয়া ইমেল দিয়ে একাউন্ট খোলা সহো আরও কতো কী?</p>
+
+      <p class="font-bold text-emerald-900 bg-emerald-50 border border-emerald-200 rounded-xl p-3">আমরা একটি বড় কঠোর সিদ্ধান্ত নিচ্ছি। আমাদের সাইটে কাজ করতে চাইলে এখন থেকে 50৳ দিয়ে KYC সম্পুর্ন করতে হবে।</p>
+
+      <p>তবে যারা ২ মাসের বেশি সময় ধরে একাউন্ট করেছেন, এবং যারা ইতিমধ্যে Withdrawal নিয়েছেন তাদের এটি নিতে হবে না।</p>
+
+      <div class="bg-emerald-50/70 border border-emerald-100 rounded-xl p-3.5 space-y-1">
+        <div class="font-extrabold text-emerald-950">KYC সম্পুর্ন করলে কী সুবিধা পাবেন?</div>
+        <div>— টাকা তুলতে রেফার করতে হবে না</div>
+        <div>— ৫০ টাকা হলেই তুলতে পারবেন</div>
+        <div>— উইথড্র করার অটো গেটওয়ের মাধ্যমে ৫-১০ মিনিটের মধ্যে Withdraw পাবেন</div>
+        <div>— যে ৫০ টাকা ডিপোজিট করবেন সেটি আপনার একাউন্টে এড হবে</div>
+        <div>— একাউন্ট ব্যান হবে না</div>
+        <div>— Pro Membership Lv2 বোনাস পাবেন</div>
+        <div>— লাইভ টেলিগ্রাম প্রিমিয়াম সাপোর্ট</div>
+        <div>— একাউন্ট সিকিউরিটি</div>
+      </div>
+
+      <p>এখন সিদ্ধান্ত আপনার হাতে, আমি কাউকে জোর করবো না। দুঃখ দিয়ে থাকলে ক্ষমাপ্রার্থী।</p>
+
+      <p class="font-extrabold text-emerald-950 pt-1">
+        — জাহিদুর হোসেন সজিব<br/>
+        <span class="text-xs text-emerald-700">Founder &amp; CEO</span>
+      </p>
+    </div>
+
+    <!-- Modal Footer Close Button -->
+    <div class="p-4 border-t border-emerald-100 bg-emerald-50/50 shrink-0">
+      <button type="button" onclick="toggleKycNoticeModal(false)"
+              class="w-full bg-emerald-900 hover:bg-emerald-800 text-white py-3 rounded-full font-extrabold text-xs shadow">
+        বন্ধ করুন (Close)
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleKycNoticeModal(show) {
+  const m = document.getElementById("kyc-notice-modal");
+  if (m) m.classList.toggle("hidden", !show);
+}
+
+function selectKycMethod(method, number, note, btn) {
+  document.getElementById("kyc-method-input").value = method;
+  document.getElementById("kyc-pay-title").innerText = `${method} ${note}`;
+  document.getElementById("kyc-pay-number").innerText = number;
+
+  document.querySelectorAll(".kyc-m-btn").forEach((el) => {
+    el.className = "kyc-m-btn py-3 px-2 rounded-2xl border border-emerald-200 bg-white font-extrabold text-xs flex flex-col items-center gap-1 transition";
+  });
+  btn.className = "kyc-m-btn py-3 px-2 rounded-2xl border-2 border-emerald-700 bg-emerald-50 font-extrabold text-xs flex flex-col items-center gap-1 transition shadow-xs";
+}
+</script>
+{% endblock %}
