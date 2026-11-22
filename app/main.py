@@ -607,7 +607,140 @@ async def admin_update_global_notice(request: Request, global_notice: str = Form
         await db.insert("site_settings", {"key": "global_notice", "value": text})
 
     return redirect_with_flash(request, "/admin", "Global Welcome Notice সফলভাবে আপডেট হয়েছে!", "success")
+# ---------------- KYC VERIFICATION SYSTEM (/kyc & /admin/kyc) ----------------
 
+@app.get("/kyc", response_class=HTMLResponse)
+async def kyc_page(request: Request):
+    user = await get_current_user(request)
+    if not user:
+        return redirect_with_flash(request, "/login", "অনুগ্রহ করে প্রথমে লগইন করুন।", "error")
+
+    try:
+        kyc_rows = await db.select("kyc_requests", filters={"user_id": user["id"]}, order="created_at.desc", limit=1)
+        latest_kyc = kyc_rows[0] if kyc_rows else None
+    except Exception:
+        latest_kyc = None
+
+    ctx = base_ctx(request, user, "kyc")
+    ctx["latest_kyc"] = latest_kyc
+    return templates.TemplateResponse("kyc.html", ctx)
+
+
+@app.post("/kyc")
+async def kyc_submit(
+    request: Request,
+    method: str = Form(...),
+    sender_number: str = Form(...),
+    trx_id: str = Form(...),
+    name: str = Form(...),
+    email: str = Form(...),
+):
+    user = await get_current_user(request)
+    if not user:
+        return redirect_with_flash(request, "/login", "অনুগ্রহ করে প্রথমে লগইন করুন।", "error")
+
+    if user.get("kyc_verified"):
+        return redirect_with_flash(request, "/kyc", "আপনার অ্যাকাউন্ট ইতিমধ্যেই KYC ভেরিফায়েড!", "info")
+
+    # Block if already pending or approved; allow retry if rejected
+    try:
+        user_kycs = await db.select("kyc_requests", filters={"user_id": user["id"]}, order="created_at.desc")
+        if any(k.get("status") in ("pending", "approved") for k in user_kycs):
+            return redirect_with_flash(request, "/kyc", "আপনার KYC আবেদন ইতিমধ্যেই জমা রয়েছে!", "info")
+    except Exception:
+        pass
+
+    allowed_methods = {"bKash", "Nagad", "Binance"}
+    if method not in allowed_methods:
+        return redirect_with_flash(request, "/kyc", "সঠিক পেমেন্ট মেথড নির্বাচন করুন!", "error")
+
+    clean_trx = trx_id.strip().upper()
+    clean_sender = sender_number.strip()
+    if len(clean_trx) < 4 or len(clean_sender) < 4:
+        return redirect_with_flash(request, "/kyc", "সঠিক Sender Number এবং TrxID দিন!", "error")
+
+    # Enforce Unique TrxID ("Ak trx sudu akbari deua jabe")
+    try:
+        dup_trx = await db.select("kyc_requests", filters={"trx_id": clean_trx}, single=True)
+        if dup_trx:
+            return redirect_with_flash(request, "/kyc", "এই TrxID ইতিমধ্যেই ব্যবহার করা হয়েছে! একই TrxID দুবার দেওয়া যাবে না।", "error")
+    except Exception:
+        pass
+
+    try:
+        await db.insert(
+            "kyc_requests",
+            {
+                "user_id": user["id"],
+                "method": method,
+                "sender_number": clean_sender,
+                "trx_id": clean_trx,
+                "name": name.strip() or user["name"],
+                "email": email.strip().lower() or user["email"],
+                "amount": 50.00,
+                "status": "pending",
+            },
+        )
+    except Exception:
+        return redirect_with_flash(request, "/kyc", "এই TrxID ইতিমধ্যেই জমা দেওয়া আছে!", "error")
+
+    return redirect_with_flash(request, "/kyc", "আপনার KYC আবেদন সফলভাবে জমা হয়েছে! ভেরিফিকেশনের পর ৫০৳ ও Pro Lv2 যুক্ত হবে।", "success")
+
+
+@app.get("/admin/kyc", response_class=HTMLResponse)
+async def admin_kyc_panel(request: Request):
+    user = await get_current_user(request)
+    if not user or not user.get("is_admin"):
+        return redirect_with_flash(request, "/i", "অ্যাডমিন অ্যাক্সেস অনুমোদিত নয়!", "error")
+
+    rows = await db.select("kyc_requests", order="created_at.desc", limit=150)
+    pending_count = sum(1 for r in rows if r.get("status") == "pending")
+
+    ctx = base_ctx(request, user, "admin")
+    ctx.update({"kyc_list": rows, "pending_count": pending_count})
+    return templates.TemplateResponse("admin_kyc.html", ctx)
+
+
+@app.post("/admin/kyc/{kyc_id}/{action}")
+async def admin_kyc_action(request: Request, kyc_id: int, action: str):
+    user = await get_current_user(request)
+    if not user or not user.get("is_admin"):
+        return redirect_with_flash(request, "/i", "অনুমোদিত নয়!", "error")
+
+    row = await db.select("kyc_requests", filters={"id": kyc_id}, single=True)
+    if not row or row["status"] != "pending":
+        return redirect_with_flash(request, "/admin/kyc", "আবেদনটি আগেই প্রসেস করা আছে।", "info")
+
+    if action == "approve":
+        await db.update("kyc_requests", {"id": kyc_id}, {"status": "approved"})
+        target = await db.select("users", filters={"id": row["user_id"]}, single=True)
+        if target:
+            exp_dt = datetime.now(timezone.utc) + timedelta(days=30)
+            await db.update(
+                "users",
+                {"id": target["id"]},
+                {
+                    "kyc_verified": True,
+                    "balance": float(target.get("balance") or 0) + 50.0,
+                    "total_earned": float(target.get("total_earned") or 0) + 50.0,
+                    "pro_plan": "mid",
+                    "pro_expires_at": exp_dt.isoformat(),
+                },
+            )
+            await db.insert(
+                "work_logs",
+                {
+                    "user_id": target["id"],
+                    "work_type": "KYC Verified Bonus",
+                    "details": f"KYC ৫০৳ ডিপোজিট ক্রেডিট + Pro Lv2 ({row['trx_id']})",
+                    "reward": 50.0,
+                },
+            )
+        return redirect_with_flash(request, "/admin/kyc", "KYC অ্যাপ্রুভ হয়েছে! ইউজারকে ৫০৳ ও Pro Lv2 দেওয়া হয়েছে।", "success")
+    else:
+        await db.update("kyc_requests", {"id": kyc_id}, {"status": "rejected"})
+        return redirect_with_flash(request, "/admin/kyc", "KYC রিজেক্ট করা হয়েছে — ইউজার আবার আবেদন করতে পারবে।", "info")
+        
 @app.get("/work", response_class=HTMLResponse)
 async def work_hub(request: Request):
     user = await get_current_user(request)
