@@ -194,7 +194,7 @@
 
       <!-- 2-STEP KYC SUBMISSION FORM -->
       <form id="kyc-submit-form" action="/kyc" method="POST" autocomplete="off" class="space-y-5">
-        <!-- STEP 1: PAYMENT (bKash Temporarily Off -> Nagad & Binance Active) -->
+        <!-- STEP 1: PAYMENT (bKash 01997448725, Nagad 01881138958, Binance 1024032723) -->
         <section class="soft-card rounded-[2rem] p-5 sm:p-6 space-y-4 border-emerald-200 shadow-lg">
           <div class="flex items-center justify-between pb-2 border-b border-emerald-100">
             <div class="flex items-center gap-2.5">
@@ -207,35 +207,26 @@
             <span class="bg-emerald-100 text-emerald-900 px-3 py-1 rounded-full text-xs font-extrabold">৳50.00</span>
           </div>
 
-          <!-- bKash Temporarily Off Notice -->
-          <div class="rounded-2xl bg-amber-50 border border-amber-300 p-3.5 text-xs text-amber-950 flex items-start gap-2.5">
-            <i class="fa-solid fa-clock text-amber-600 text-sm mt-0.5 shrink-0"></i>
-            <div>
-              <b>bKash সাময়িকভাবে বন্ধ আছে!</b> বিকাল <b>৫:৩০</b> থেকে bKash পুনরায় চালু থাকবে। অনুগ্রহ করে এখন <b>Nagad</b> অথবা <b>Binance</b> ব্যবহার করুন।
-            </div>
-          </div>
-
-          <!-- Method Selection (Nagad Default, Binance Active, bKash Off) -->
+          <!-- Method Selection -->
           <div>
             <label class="text-xs font-extrabold text-emerald-950 block mb-2">পেমেন্ট মেথড বেছে নিন</label>
-            <input type="hidden" name="method" id="kyc-method-input" value="Nagad" />
+            <input type="hidden" name="method" id="kyc-method-input" value="bKash" />
             <div class="grid grid-cols-3 gap-2.5">
-              <!-- bKash (Temporarily Off - No Number Shown) -->
-              <button type="button" onclick="showBkashOffAlert()"
-                      class="relative py-3 px-2 rounded-2xl border border-slate-200 bg-slate-100/80 text-slate-400 font-extrabold text-xs flex flex-col items-center gap-1 cursor-not-allowed opacity-75">
-                <span class="absolute -top-2 right-1.5 bg-red-600 text-white text-[8px] font-extrabold px-2 py-0.5 rounded-full shadow">সাময়িক বন্ধ</span>
-                <svg viewBox="0 0 40 40" class="w-7 h-7 grayscale"><path d="M8 10l12 6 10-8-4 14 6 6-14-2-8 6 2-12z" fill="#e2136e"/></svg>
+              <!-- bKash (Updated Number: 01997448725) -->
+              <button type="button" onclick="selectKycMethod('bKash', '01997448725', 'Send Money (Personal)', this)"
+                      class="kyc-m-btn py-3 px-2 rounded-2xl border-2 border-emerald-700 bg-emerald-50 font-extrabold text-xs flex flex-col items-center gap-1 transition shadow-xs">
+                <svg viewBox="0 0 40 40" class="w-7 h-7"><path d="M8 10l12 6 10-8-4 14 6 6-14-2-8 6 2-12z" fill="#e2136e"/></svg>
                 <span>bKash</span>
               </button>
 
-              <!-- Nagad (Default Active) -->
+              <!-- Nagad -->
               <button type="button" onclick="selectKycMethod('Nagad', '01881138958', 'Send Money (Personal)', this)"
-                      class="kyc-m-btn py-3 px-2 rounded-2xl border-2 border-emerald-700 bg-emerald-50 font-extrabold text-xs flex flex-col items-center gap-1 transition shadow-xs">
+                      class="kyc-m-btn py-3 px-2 rounded-2xl border border-emerald-200 bg-white font-extrabold text-xs flex flex-col items-center gap-1 transition">
                 <svg viewBox="0 0 40 40" class="w-7 h-7"><circle cx="20" cy="20" r="14" fill="#f26522"/><path d="M13 24c2-8 9-12 15-10-4 2-6 5-7 10z" fill="#fff"/></svg>
                 <span>Nagad</span>
               </button>
 
-              <!-- Binance (Active) -->
+              <!-- Binance -->
               <button type="button" onclick="selectKycMethod('Binance', '1024032723', 'Binance Pay ID (0.45 USDT)', this)"
                       class="kyc-m-btn py-3 px-2 rounded-2xl border border-emerald-200 bg-white font-extrabold text-xs flex flex-col items-center gap-1 transition">
                 <svg viewBox="0 0 40 40" class="w-7 h-7"><path d="M20 8l5 5-5 5-5-5zm-8 8l4 4-4 4-4-4zm16 0l4 4-4 4-4-4zm-8 6l5 5-5 5-5-5z" fill="#f3ba2f"/></svg>
@@ -244,19 +235,14 @@
             </div>
           </div>
 
-          <!-- Inline alert when clicking disabled bKash -->
-          <div id="bkash-off-msg" class="hidden rounded-xl bg-red-50 border border-red-200 px-3.5 py-2 text-[11px] font-bold text-red-700">
-            <i class="fa-solid fa-circle-info mr-1"></i> bKash সাময়িক বন্ধ আছে (বিকাল ৫:৩০-এ চালু হবে)। অনুগ্রহ করে Nagad বা Binance ব্যবহার করুন।
-          </div>
-
-          <!-- Dynamic Payment Number Box (Defaults to Nagad: 01881138958) -->
+          <!-- Dynamic Payment Number Box (Defaults to bKash: 01997448725) -->
           <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 space-y-2">
             <div class="flex items-center justify-between text-xs font-extrabold text-emerald-900">
-              <span id="kyc-pay-title">Nagad Send Money (Personal)</span>
+              <span id="kyc-pay-title">bKash Send Money (Personal)</span>
               <span class="text-emerald-700">পরিমাণ: ৳50</span>
             </div>
             <div class="flex items-center justify-between bg-white border border-emerald-200 rounded-xl px-3.5 py-2.5">
-              <span id="kyc-pay-number" class="font-mono text-base font-extrabold text-emerald-950">01881138958</span>
+              <span id="kyc-pay-number" class="font-mono text-base font-extrabold text-emerald-950">01997448725</span>
               <button id="kyc-copy-btn" type="button" onclick="copyText(document.getElementById('kyc-pay-number').innerText, 'kyc-copy-btn')"
                       class="bg-emerald-900 hover:bg-emerald-800 text-white px-3.5 py-1.5 rounded-xl text-xs font-extrabold">
                 <i class="fa-solid fa-copy mr-1"></i>কপি
@@ -272,7 +258,7 @@
             </div>
             <div>
               <label class="text-xs font-extrabold text-emerald-950 block mb-1">Transaction ID (TrxID) *</label>
-              <input type="text" name="trx_id" required autocomplete="off" placeholder="যেমন: 72A9F4K1M2"
+              <input type="text" name="trx_id" required autocomplete="off" placeholder="যেমন: BKA8F3X92M"
                      class="w-full px-4 py-3 rounded-2xl border border-emerald-200 bg-white font-mono font-bold uppercase focus:outline-none focus:ring-2 focus:ring-emerald-500" />
             </div>
           </div>
@@ -382,15 +368,7 @@ function toggleKycNoticeModal(show) {
   if (m) m.classList.toggle("hidden", !show);
 }
 
-function showBkashOffAlert() {
-  const box = document.getElementById("bkash-off-msg");
-  if (box) box.classList.remove("hidden");
-}
-
 function selectKycMethod(method, number, note, btn) {
-  const offBox = document.getElementById("bkash-off-msg");
-  if (offBox) offBox.classList.add("hidden");
-
   document.getElementById("kyc-method-input").value = method;
   document.getElementById("kyc-pay-title").innerText = `${method} ${note}`;
   document.getElementById("kyc-pay-number").innerText = number;
