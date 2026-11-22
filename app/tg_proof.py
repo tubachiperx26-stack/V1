@@ -1,6 +1,6 @@
 import html
 import random
-import secrets
+import string
 from datetime import datetime, timezone, timedelta
 import httpx
 
@@ -9,8 +9,22 @@ from app.db import db
 
 BD_TZ = timezone(timedelta(hours=6))
 
-# In-memory streak guard so 60% Success / 37% Request / 3% Reject mix naturally
 _LAST_STATUS_KEY = None
+
+REF_PREFIXES = [
+    "ARIF", "RAFI", "TANV", "SADI", "MEHE", "NUSR", "SABB", "MAHM", "NAIM", "SHAW",
+    "FAHM", "JUBA", "IMRA", "RAKI", "TASP", "FARI", "SUMI", "NAZM", "KAMR", "RIFA",
+    "TOUH", "HABI", "SOHA", "MIRA", "SAIF", "ASIF", "ZAYN", "NABI", "TARE", "ALAM",
+    "SHAK", "ROBI", "MUNI", "RIYA", "ANIK", "EMON", "HRID", "KABI", "LAMI", "MONI",
+    "NIHA", "OMAR", "PARV", "RUMU", "SHIH", "TARI", "UMME", "WASI", "YASI", "ZAKI",
+    "RUBEL", "SUJON", "MARU", "NISH", "TANI", "AKAS", "BISH", "CHOW", "DIPA", "FARH",
+]
+
+ALPHANUM = string.ascii_uppercase + string.digits
+
+
+def random_alnum(length: int) -> str:
+    return "".join(random.choices(ALPHANUM, k=length))
 
 
 def mask_account(acc: str) -> str:
@@ -48,18 +62,21 @@ def pick_weighted_status() -> tuple[str, str, str, str, str]:
 
 def pick_weighted_amount() -> float:
     """
-    Minimum 400৳:
-    60% -> 400 - 500
-    25% -> 500 - 1000
-    10% -> 1000 - 1500
-    5%  -> 2000 - 2200
+    Minimum 100৳+:
+    35% -> 100 - 350
+    35% -> 350 - 550
+    20% -> 550 - 1000
+    7%  -> 1000 - 1500
+    3%  -> 2000 - 2200
     """
     r = random.random() * 100
-    if r < 60:
-        return float(random.randint(80, 100) * 5)      # 400 - 500
-    elif r < 85:
-        return float(random.randint(100, 200) * 5)     # 500 - 1000
-    elif r < 95:
+    if r < 35:
+        return float(random.randint(20, 70) * 5)       # 100 - 350
+    elif r < 70:
+        return float(random.randint(70, 110) * 5)      # 350 - 550
+    elif r < 90:
+        return float(random.randint(110, 200) * 5)     # 550 - 1000
+    elif r < 97:
         return float(random.randint(100, 150) * 10)    # 1000 - 1500
     else:
         return float(random.randint(200, 220) * 10)    # 2000 - 2200
@@ -98,9 +115,8 @@ def generate_realistic_fake_proof(force_type: str | None = None) -> dict:
         last4 = random.randint(1000, 9999)
         masked_acc = f"{prefix}••••{last4}"
 
-    user_id = random.randint(1024, 9890)
-    ref_prefixes = ["ARIF", "RAFI", "TANV", "SADI", "MEHE", "NUSR", "SABB", "MAHM", "NAIM", "INF"]
-    refer_id = f"{random.choice(ref_prefixes)}{secrets.token_hex(2).upper()}"
+    user_id = random.randint(1024, 19890)
+    refer_id = "DIRECT" if random.random() < 0.12 else f"{random.choice(REF_PREFIXES)}{random_alnum(5)}"
     trx_hash = f"IW-PAY-{random.randint(78329, 99999)}"
 
     return {
