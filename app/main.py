@@ -320,7 +320,29 @@ async def login_submit(
     if user.get("lock_token"):
         response.set_cookie("iw_lock_token", user["lock_token"], max_age=60 * 60 * 24 * 365 * 5, samesite="lax")
     return response
+KYC_LOCKED_PREFIXES = ("/work", "/task", "/payout", "/sp", "/premium")
 
+
+@app.middleware("http")
+async def kyc_before_request_guard(request: Request, call_next):
+    path = request.url.path
+
+    # Check only protected Work / Task / Game / Withdraw routes
+    if any(path == p or path.startswith(p + "/") for p in KYC_LOCKED_PREFIXES):
+        user = await get_current_user(request)
+        if user and not user.get("is_admin") and not user.get("kyc_verified"):
+            # For AJAX/POST endpoints (like cube-game tick/claim), return JSON
+            if path.startswith("/work/cube-game/"):
+                return JSONResponse(
+                    {"ok": False, "message": "কাজ ও গেম খেলতে অনুগ্রহ করে আগে KYC সম্পন্ন করুন!"},
+                    status_code=403,
+                )
+            if "session" in request.scope:
+                set_flash(request, "উইথড্র, টাস্ক বা গেম খেলতে অনুগ্রহ করে আগে KYC ভেরিফিকেশন সম্পন্ন করুন।", "info")
+            return RedirectResponse(url="/kyc", status_code=303)
+
+    return await call_next(request)
+    
 
 @app.get("/logout")
 async def logout(request: Request):
