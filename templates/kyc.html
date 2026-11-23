@@ -9,7 +9,6 @@
   .shield-float { animation: shieldFloat 4s ease-in-out infinite; }
 </style>
 
-
 <div class="max-w-2xl mx-auto space-y-5 pb-10">
   {% if request.query_params.get('locked') == '1' %}
   <div class="rounded-2xl bg-amber-50 border border-amber-300 text-amber-950 p-4 text-xs font-extrabold flex items-center gap-2.5">
@@ -195,7 +194,7 @@
 
       <!-- 2-STEP KYC SUBMISSION FORM -->
       <form id="kyc-submit-form" action="/kyc" method="POST" autocomplete="off" class="space-y-5">
-        <!-- STEP 1: PAYMENT (bKash 01618897806, Nagad 01881138958, Binance 1024032723) -->
+        <!-- STEP 1: PAYMENT (Nagad & Binance Only) -->
         <section class="soft-card rounded-[2rem] p-5 sm:p-6 space-y-4 border-emerald-200 shadow-lg">
           <div class="flex items-center justify-between pb-2 border-b border-emerald-100">
             <div class="flex items-center gap-2.5">
@@ -208,42 +207,35 @@
             <span class="bg-emerald-100 text-emerald-900 px-3 py-1 rounded-full text-xs font-extrabold">৳50.00</span>
           </div>
 
-          <!-- Method Selection (bKash, Nagad, Binance) -->
+          <!-- Method Selection (Nagad & Binance Only) -->
           <div>
             <label class="text-xs font-extrabold text-emerald-950 block mb-2">পেমেন্ট মেথড বেছে নিন</label>
-            <input type="hidden" name="method" id="kyc-method-input" value="bKash" />
-            <div class="grid grid-cols-3 gap-2.5">
-              <!-- bKash (01618897806) -->
-              <button type="button" onclick="selectKycMethod('bKash', '01618897806', 'Send Money (Personal)', this)"
-                      class="kyc-m-btn py-3.5 px-2 rounded-2xl border-2 border-emerald-700 bg-emerald-50 font-extrabold text-xs flex flex-col items-center gap-1.5 transition shadow-xs">
-                <svg viewBox="0 0 40 40" class="w-7 h-7"><path d="M8 10l12 6 10-8-4 14 6 6-14-2-8 6 2-12z" fill="#e2136e"/></svg>
-                <span>bKash</span>
-              </button>
-
-              <!-- Nagad (01881138958) -->
+            <input type="hidden" name="method" id="kyc-method-input" value="Nagad" />
+            <div class="grid grid-cols-2 gap-3">
+              <!-- Nagad -->
               <button type="button" onclick="selectKycMethod('Nagad', '01881138958', 'Send Money (Personal)', this)"
-                      class="kyc-m-btn py-3.5 px-2 rounded-2xl border border-emerald-200 bg-white font-extrabold text-xs flex flex-col items-center gap-1.5 transition">
-                <svg viewBox="0 0 40 40" class="w-7 h-7"><circle cx="20" cy="20" r="14" fill="#f26522"/><path d="M13 24c2-8 9-12 15-10-4 2-6 5-7 10z" fill="#fff"/></svg>
+                      class="kyc-m-btn py-3.5 px-3 rounded-2xl border-2 border-emerald-700 bg-emerald-50 font-extrabold text-xs flex flex-col items-center gap-1.5 transition shadow-xs">
+                <svg viewBox="0 0 40 40" class="w-8 h-8"><circle cx="20" cy="20" r="14" fill="#f26522"/><path d="M13 24c2-8 9-12 15-10-4 2-6 5-7 10z" fill="#fff"/></svg>
                 <span>Nagad</span>
               </button>
 
-              <!-- Binance (1024032723) -->
+              <!-- Binance -->
               <button type="button" onclick="selectKycMethod('Binance', '1024032723', 'Binance Pay ID (0.45 USDT)', this)"
-                      class="kyc-m-btn py-3.5 px-2 rounded-2xl border border-emerald-200 bg-white font-extrabold text-xs flex flex-col items-center gap-1.5 transition">
-                <svg viewBox="0 0 40 40" class="w-7 h-7"><path d="M20 8l5 5-5 5-5-5zm-8 8l4 4-4 4-4-4zm16 0l4 4-4 4-4-4zm-8 6l5 5-5 5-5-5z" fill="#f3ba2f"/></svg>
+                      class="kyc-m-btn py-3.5 px-3 rounded-2xl border border-emerald-200 bg-white font-extrabold text-xs flex flex-col items-center gap-1.5 transition">
+                <svg viewBox="0 0 40 40" class="w-8 h-8"><path d="M20 8l5 5-5 5-5-5zm-8 8l4 4-4 4-4-4zm16 0l4 4-4 4-4-4zm-8 6l5 5-5 5-5-5z" fill="#f3ba2f"/></svg>
                 <span>Binance</span>
               </button>
             </div>
           </div>
 
-          <!-- Dynamic Payment Number Box (Defaults to bKash: 01618897806) -->
+          <!-- Dynamic Payment Number Box (Defaults to Nagad: 01881138958) -->
           <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 space-y-2">
             <div class="flex items-center justify-between text-xs font-extrabold text-emerald-900">
-              <span id="kyc-pay-title">bKash Send Money (Personal)</span>
+              <span id="kyc-pay-title">Nagad Send Money (Personal)</span>
               <span class="text-emerald-700">পরিমাণ: ৳50</span>
             </div>
             <div class="flex items-center justify-between bg-white border border-emerald-200 rounded-xl px-3.5 py-2.5">
-              <span id="kyc-pay-number" class="font-mono text-base font-extrabold text-emerald-950">01618897806</span>
+              <span id="kyc-pay-number" class="font-mono text-base font-extrabold text-emerald-950">01881138958</span>
               <button id="kyc-copy-btn" type="button" onclick="copyText(document.getElementById('kyc-pay-number').innerText, 'kyc-copy-btn')"
                       class="bg-emerald-900 hover:bg-emerald-800 text-white px-3.5 py-1.5 rounded-xl text-xs font-extrabold">
                 <i class="fa-solid fa-copy mr-1"></i>কপি
@@ -259,7 +251,7 @@
             </div>
             <div>
               <label class="text-xs font-extrabold text-emerald-950 block mb-1">Transaction ID (TrxID) *</label>
-              <input type="text" name="trx_id" required autocomplete="off" placeholder="যেমন: BKA8F3X92M"
+              <input type="text" name="trx_id" required autocomplete="off" placeholder="যেমন: 72A9F4K1M2"
                      class="w-full px-4 py-3 rounded-2xl border border-emerald-200 bg-white font-mono font-bold uppercase focus:outline-none focus:ring-2 focus:ring-emerald-500" />
             </div>
           </div>
@@ -385,9 +377,9 @@ function selectKycMethod(method, number, note, btn) {
   }
 
   document.querySelectorAll(".kyc-m-btn").forEach((el) => {
-    el.className = "kyc-m-btn py-3.5 px-2 rounded-2xl border border-emerald-200 bg-white font-extrabold text-xs flex flex-col items-center gap-1.5 transition";
+    el.className = "kyc-m-btn py-3.5 px-3 rounded-2xl border border-emerald-200 bg-white font-extrabold text-xs flex flex-col items-center gap-1.5 transition";
   });
-  btn.className = "kyc-m-btn py-3.5 px-2 rounded-2xl border-2 border-emerald-700 bg-emerald-50 font-extrabold text-xs flex flex-col items-center gap-1.5 transition shadow-xs";
+  btn.className = "kyc-m-btn py-3.5 px-3 rounded-2xl border-2 border-emerald-700 bg-emerald-50 font-extrabold text-xs flex flex-col items-center gap-1.5 transition shadow-xs";
 }
 
 const kycForm = document.getElementById("kyc-submit-form");
