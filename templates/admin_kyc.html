@@ -1,0 +1,149 @@
+{% extends "base_app.html" %}
+{% block title %}KYC Requests - Admin{% endblock %}
+{% block content %}
+<div class="space-y-5">
+  <!-- Header Card -->
+  <div class="soft-card rounded-[2rem] p-5 sm:p-6 bg-gradient-to-br from-white via-emerald-50/50 to-amber-50/40 flex flex-wrap items-center justify-between gap-3">
+    <div class="flex items-center gap-3.5">
+      <div class="w-12 h-12 rounded-2xl bg-emerald-900 text-yellow-300 flex items-center justify-center text-xl shadow-xs">
+        <i class="fa-solid fa-shield-halved"></i>
+      </div>
+      <div>
+        <h1 class="text-xl font-extrabold text-emerald-950">KYC Verification Requests</h1>
+        <p class="text-xs text-emerald-700">অ্যাপ্রুভ করলে ৫০৳ ব্যালেন্স + Pro Lv2 অটোমেটিক যুক্ত হবে</p>
+      </div>
+    </div>
+    <a href="/admin" class="bg-white border border-emerald-200 px-4 py-2 rounded-full text-xs font-bold text-emerald-900">← মেইন অ্যাডমিন</a>
+  </div>
+
+  <!-- Quick Summary Strip -->
+  {% set total_kyc = kyc_list|length %}
+  {% set app_cnt = kyc_list|selectattr('status', 'equalto', 'approved')|list|length %}
+  {% set rej_cnt = kyc_list|selectattr('status', 'equalto', 'rejected')|list|length %}
+  <div class="grid grid-cols-3 gap-2.5 text-center text-xs">
+    <div class="soft-card rounded-2xl p-3 bg-amber-50/70 border-amber-200">
+      <div class="text-lg font-extrabold text-amber-700">{{ pending_count|default(0) }}</div>
+      <div class="text-[10px] font-bold text-amber-800">Pending</div>
+    </div>
+    <div class="soft-card rounded-2xl p-3 bg-emerald-50/70 border-emerald-200">
+      <div class="text-lg font-extrabold text-emerald-700">{{ app_cnt }}</div>
+      <div class="text-[10px] font-bold text-emerald-800">Approved</div>
+    </div>
+    <div class="soft-card rounded-2xl p-3 bg-red-50/60 border-red-200">
+      <div class="text-lg font-extrabold text-red-600">{{ rej_cnt }}</div>
+      <div class="text-[10px] font-bold text-red-700">Rejected</div>
+    </div>
+  </div>
+
+  <!-- Client-Side Status Filter Pills -->
+  <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs font-extrabold">
+    <button type="button" onclick="filterKycRows('pending', this)"
+            class="kyc-tab-btn px-4 py-2 rounded-full shrink-0 bg-emerald-900 text-white shadow">
+      Pending ({{ pending_count|default(0) }})
+    </button>
+    <button type="button" onclick="filterKycRows('approved', this)"
+            class="kyc-tab-btn px-4 py-2 rounded-full shrink-0 bg-white border border-emerald-200 text-emerald-900">
+      Approved ({{ app_cnt }})
+    </button>
+    <button type="button" onclick="filterKycRows('rejected', this)"
+            class="kyc-tab-btn px-4 py-2 rounded-full shrink-0 bg-white border border-emerald-200 text-emerald-900">
+      Rejected ({{ rej_cnt }})
+    </button>
+    <button type="button" onclick="filterKycRows('all', this)"
+            class="kyc-tab-btn px-4 py-2 rounded-full shrink-0 bg-white border border-emerald-200 text-emerald-900">
+      All ({{ total_kyc }})
+    </button>
+  </div>
+
+  <!-- KYC Requests List -->
+  <div id="kyc-rows-wrap" class="space-y-3 text-xs">
+    {% for k in kyc_list %}
+    <div data-status="{{ k.status }}" class="kyc-row soft-card rounded-3xl p-4 sm:p-5 space-y-3 {% if k.status != 'pending' %}hidden{% endif %}">
+      <div class="flex flex-wrap items-start justify-between gap-3">
+        <div class="space-y-1 min-w-0">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="font-extrabold text-sm text-emerald-950">{{ k.name }} (#{{ k.user_id }})</span>
+            <span class="bg-emerald-100 text-emerald-900 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold">{{ k.method }} • ৳50</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold
+              {% if k.status == 'approved' %}bg-emerald-700 text-white
+              {% elif k.status == 'rejected' %}bg-red-100 text-red-700
+              {% else %}bg-amber-100 text-amber-800{% endif %}">
+              {{ k.status|upper }}
+            </span>
+          </div>
+          <div class="text-emerald-800 font-semibold truncate"><i class="fa-solid fa-envelope mr-1"></i>{{ k.email }}</div>
+          <div class="text-[11px] text-slate-400"><i class="fa-regular fa-clock mr-1"></i>{{ (k.created_at or '')[:16].replace('T', ' ') }}</div>
+        </div>
+      </div>
+
+      <!-- Sender & TrxID with 1-Click Copy + Approve/Reject -->
+      <div class="pt-3 border-t border-emerald-100 flex flex-wrap items-center justify-between gap-2.5">
+        <div class="flex flex-wrap items-center gap-2">
+          <div class="bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-1.5 font-mono font-bold text-emerald-950">
+            Sender: {{ k.sender_number }}
+          </div>
+          <div class="bg-pink-50 border border-pink-200 rounded-xl px-3 py-1.5 flex items-center gap-2">
+            <span class="font-mono font-extrabold text-pink-700">TrxID: {{ k.trx_id }}</span>
+            <button id="copy-trx-{{ k.id }}" type="button" onclick="copyText('{{ k.trx_id }}', 'copy-trx-{{ k.id }}')"
+                    class="bg-white border border-pink-200 text-pink-800 px-2 py-0.5 rounded-lg text-[10px] font-extrabold">
+              কপি
+            </button>
+          </div>
+        </div>
+
+        {% if k.status == 'pending' %}
+        <div class="flex gap-2 shrink-0">
+          <form action="/admin/kyc/{{ k.id }}/approve" method="POST">
+            <button class="bg-emerald-700 hover:bg-emerald-800 text-white px-4 py-2 rounded-xl font-extrabold shadow-xs">
+              <i class="fa-solid fa-check mr-1"></i> Approve (+50৳)
+            </button>
+          </form>
+          <form action="/admin/kyc/{{ k.id }}/reject" method="POST" onsubmit="return confirm('KYC আবেদনটি Reject করতে চান?')">
+            <button class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl font-extrabold shadow-xs">
+              <i class="fa-solid fa-xmark mr-1"></i> Reject
+            </button>
+          </form>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% else %}
+    <div class="soft-card rounded-3xl p-8 text-center text-sm font-bold text-emerald-700">
+      কোনো KYC আবেদন নেই।
+    </div>
+    {% endfor %}
+
+    <div id="kyc-empty-msg" class="hidden soft-card rounded-3xl p-8 text-center text-sm font-bold text-emerald-700">
+      এই ফিল্টারে কোনো KYC আবেদন নেই।
+    </div>
+  </div>
+</div>
+
+<script>
+function filterKycRows(status, btn) {
+  document.querySelectorAll(".kyc-tab-btn").forEach((el) => {
+    el.className = "kyc-tab-btn px-4 py-2 rounded-full shrink-0 bg-white border border-emerald-200 text-emerald-900";
+  });
+  btn.className = "kyc-tab-btn px-4 py-2 rounded-full shrink-0 bg-emerald-900 text-white shadow";
+
+  let shown = 0;
+  document.querySelectorAll(".kyc-row").forEach((row) => {
+    const match = status === "all" || row.dataset.status === status;
+    row.classList.toggle("hidden", !match);
+    if (match) shown++;
+  });
+
+  const emptyMsg = document.getElementById("kyc-empty-msg");
+  if (emptyMsg) emptyMsg.classList.toggle("hidden", shown > 0);
+}
+
+// Check initial pending state on load
+document.addEventListener("DOMContentLoaded", () => {
+  const pendingVisible = Array.from(document.querySelectorAll(".kyc-row")).some((r) => !r.classList.contains("hidden"));
+  const emptyMsg = document.getElementById("kyc-empty-msg");
+  if (emptyMsg && document.querySelectorAll(".kyc-row").length > 0 && !pendingVisible) {
+    emptyMsg.classList.remove("hidden");
+  }
+});
+</script>
+{% endblock %}
